@@ -87,6 +87,24 @@
             font-weight: 600;
             color: #333;
             margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .wave-icon {
+            width: 28px;
+            height: 28px;
+            animation: wave 1.5s ease-in-out infinite;
+            transform-origin: 70% 70%;
+        }
+        
+        @keyframes wave {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(20deg); }
+            50% { transform: rotate(-10deg); }
+            75% { transform: rotate(20deg); }
         }
         
         .greeting-text {
@@ -149,16 +167,6 @@
             font-weight: 500;
         }
         
-        .message.success {
-            color: var(--primary-color);
-            font-weight: 500;
-        }
-        
-        .message-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-        }
-        
         .status-box {
             background: #f8f9fa;
             border-radius: 8px;
@@ -167,6 +175,258 @@
             font-size: 14px;
             color: #333;
             border-left: 4px solid var(--primary-color);
+        }
+        
+        /* ==================== ERROR VIEW STYLES ==================== */
+        .error-icon-container {
+            margin-bottom: 20px;
+        }
+        
+        .error-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #dc3545, #ff6b6b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(220, 53, 69, 0.3);
+            animation: errorShake 0.5s ease-in-out;
+        }
+        
+        .error-icon svg {
+            width: 40px;
+            height: 40px;
+        }
+        
+        @keyframes errorShake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-10px); }
+            40% { transform: translateX(10px); }
+            60% { transform: translateX(-10px); }
+            80% { transform: translateX(10px); }
+        }
+        
+        /* ==================== SUCCESS VIEW STYLES ==================== */
+        .success-container {
+            padding: 20px 0;
+        }
+        
+        .checkmark-circle {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            margin: 0 auto 25px;
+        }
+        
+        .checkmark-circle .background {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00c851, #00ff41);
+            position: absolute;
+            animation: scaleIn 0.5s ease-out forwards;
+            box-shadow: 0 10px 30px rgba(0, 200, 81, 0.4);
+        }
+        
+        .checkmark-circle .checkmark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+        }
+        
+        .checkmark-circle .checkmark-stem {
+            position: absolute;
+            width: 5px;
+            height: 30px;
+            background-color: white;
+            left: 26px;
+            top: 10px;
+            border-radius: 3px;
+            transform: rotate(45deg);
+            transform-origin: bottom;
+            animation: checkmarkStem 0.3s ease-out 0.4s forwards;
+            opacity: 0;
+        }
+        
+        .checkmark-circle .checkmark-kick {
+            position: absolute;
+            width: 5px;
+            height: 15px;
+            background-color: white;
+            left: 14px;
+            top: 25px;
+            border-radius: 3px;
+            transform: rotate(-45deg);
+            transform-origin: bottom;
+            animation: checkmarkKick 0.2s ease-out 0.6s forwards;
+            opacity: 0;
+        }
+        
+        .confetti-container {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 150px;
+            pointer-events: none;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            opacity: 0;
+        }
+        
+        .confetti:nth-child(1) {
+            background: #00c851;
+            left: 20%;
+            animation: confetti1 1s ease-out 0.7s forwards;
+        }
+        
+        .confetti:nth-child(2) {
+            background: #ffeb3b;
+            left: 40%;
+            border-radius: 50%;
+            animation: confetti2 1s ease-out 0.8s forwards;
+        }
+        
+        .confetti:nth-child(3) {
+            background: #2196f3;
+            left: 60%;
+            animation: confetti3 1s ease-out 0.75s forwards;
+        }
+        
+        .confetti:nth-child(4) {
+            background: #ff5722;
+            left: 80%;
+            border-radius: 50%;
+            animation: confetti4 1s ease-out 0.85s forwards;
+        }
+        
+        .confetti:nth-child(5) {
+            background: #9c27b0;
+            left: 30%;
+            animation: confetti5 1s ease-out 0.9s forwards;
+        }
+        
+        .confetti:nth-child(6) {
+            background: #00bcd4;
+            left: 70%;
+            border-radius: 50%;
+            animation: confetti6 1s ease-out 0.95s forwards;
+        }
+        
+        .success-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+            opacity: 0;
+            animation: fadeInUp 0.5s ease-out 0.8s forwards;
+        }
+        
+        .success-subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeInUp 0.5s ease-out 0.9s forwards;
+        }
+        
+        .pulse-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid rgba(0, 200, 81, 0.5);
+            animation: pulseRing 1.5s ease-out 0.5s infinite;
+        }
+        
+        .pulse-ring:nth-child(2) {
+            animation-delay: 0.8s;
+        }
+        
+        @keyframes scaleIn {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        @keyframes checkmarkStem {
+            0% { height: 0; opacity: 1; }
+            100% { height: 30px; opacity: 1; }
+        }
+        
+        @keyframes checkmarkKick {
+            0% { height: 0; opacity: 1; }
+            100% { height: 15px; opacity: 1; }
+        }
+        
+        @keyframes pulseRing {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+            100% { transform: translate(-50%, -50%) scale(1.8); opacity: 0; }
+        }
+        
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes confetti1 {
+            0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+            100% { opacity: 0; transform: translateY(-100px) translateX(-20px) rotate(360deg); }
+        }
+        
+        @keyframes confetti2 {
+            0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+            100% { opacity: 0; transform: translateY(-120px) translateX(10px) rotate(-360deg); }
+        }
+        
+        @keyframes confetti3 {
+            0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+            100% { opacity: 0; transform: translateY(-90px) translateX(15px) rotate(270deg); }
+        }
+        
+        @keyframes confetti4 {
+            0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+            100% { opacity: 0; transform: translateY(-110px) translateX(25px) rotate(-270deg); }
+        }
+        
+        @keyframes confetti5 {
+            0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+            100% { opacity: 0; transform: translateY(-130px) translateX(-15px) rotate(450deg); }
+        }
+        
+        @keyframes confetti6 {
+            0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+            100% { opacity: 0; transform: translateY(-80px) translateX(20px) rotate(-450deg); }
+        }
+        
+        .loading-dots {
+            display: inline-block;
+        }
+        
+        .loading-dots span {
+            animation: dotPulse 1.4s infinite ease-in-out both;
+        }
+        
+        .loading-dots span:nth-child(1) { animation-delay: 0s; }
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes dotPulse {
+            0%, 80%, 100% { opacity: 0.3; }
+            40% { opacity: 1; }
         }
     </style>
 </head>
@@ -200,18 +460,41 @@
         
         <!-- Success View -->
         <div id="successView" class="view">
-            <div class="message-icon">✅</div>
-            <div class="message success">
-                ลงทะเบียนสำเร็จแล้ว!
-            </div>
-            <div id="successMessage" class="message">
-                กำลังปิดหน้านี้...
+            <div class="success-container">
+                <div class="checkmark-circle">
+                    <div class="pulse-ring"></div>
+                    <div class="pulse-ring"></div>
+                    <div class="background"></div>
+                    <div class="checkmark">
+                        <div class="checkmark-stem"></div>
+                        <div class="checkmark-kick"></div>
+                    </div>
+                    <div class="confetti-container">
+                        <div class="confetti"></div>
+                        <div class="confetti"></div>
+                        <div class="confetti"></div>
+                        <div class="confetti"></div>
+                        <div class="confetti"></div>
+                        <div class="confetti"></div>
+                    </div>
+                </div>
+                
+                <div class="success-title">ลงทะเบียนสำเร็จ!</div>
+                <div class="success-subtitle">
+                    กำลังปิดหน้านี้<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>
+                </div>
             </div>
         </div>
         
         <!-- Error View -->
         <div id="errorView" class="view">
-            <div class="message-icon">❌</div>
+            <div class="error-icon-container">
+                <div class="error-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 6L6 18M6 6L18 18" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            </div>
             <div id="errorMessage" class="message error"></div>
             <button id="retryBtn" class="btn btn-primary" style="display:none;">
                 ลองใหม่อีกครั้ง
@@ -234,6 +517,14 @@
             INIT_TIMEOUT: 30000,
             MIN_LOGIN_INTERVAL: 5000
         };
+        
+        // Wave hand SVG icon
+        const WAVE_ICON_SVG = `<svg class="wave-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7.5 12.5L5.5 10.5C4.94772 9.94772 4.94772 9.05228 5.5 8.5C6.05228 7.94772 6.94772 7.94772 7.5 8.5L12 13" stroke="#FFB800" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M9.5 10.5L7.5 8.5C6.94772 7.94772 6.94772 7.05228 7.5 6.5C8.05228 5.94772 8.94772 5.94772 9.5 6.5L14 11" stroke="#FFB800" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M11.5 8.5L10.5 7.5C9.94772 6.94772 9.94772 6.05228 10.5 5.5C11.0523 4.94772 11.9477 4.94772 12.5 5.5L17 10" stroke="#FFB800" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M13.5 6.5L13 6C12.4477 5.44772 12.4477 4.55228 13 4C13.5523 3.44772 14.4477 3.44772 15 4L19 8C21 10 21 13 19 15L17 17C15 19 12 19 10 17L6.5 13.5C5.94772 12.9477 5.94772 12.0523 6.5 11.5C7.05228 10.9477 7.94772 10.9477 8.5 11.5L11.5 14.5" stroke="#FFB800" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>`;
         
         // ==================== GLOBAL STATE ====================
         let state = {
@@ -262,7 +553,7 @@
             const defaultImage = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="%23ddd"/><text x="50" y="55" font-family="Arial" font-size="14" fill="%23999" text-anchor="middle">No Image</text></svg>';
             
             document.getElementById('profileImage').src = profile.pictureUrl || defaultImage;
-            document.getElementById('userName').textContent = `สวัสดีค่ะ คุณ${profile.displayName || 'ผู้ใช้'} 👋`;
+            document.getElementById('userName').innerHTML = `<span>สวัสดีค่ะ คุณ${profile.displayName || 'ผู้ใช้'}</span>${WAVE_ICON_SVG}`;
             
             showView('userInfoView');
         }
@@ -279,8 +570,7 @@
             statusBox.style.display = 'block';
         }
         
-        function showSuccess(message = 'กำลังปิดหน้านี้...') {
-            document.getElementById('successMessage').textContent = message;
+        function showSuccess() {
             showView('successView');
         }
         
@@ -393,12 +683,11 @@
                 
                 const result = await response.json();
                 
-                showSuccess('ลงทะเบียนสำเร็จแล้ว!');
+                showSuccess();
                 
-                // ปิดหน้าเว็บทันที
                 setTimeout(() => {
                     closeWindow();
-                }, 1500);
+                }, 2500);
                 
             } catch (error) {
                 state.isProcessing = false;
@@ -419,7 +708,6 @@
         
         // ==================== WINDOW CLOSING ====================
         function closeWindow() {
-            // วิธีที่ 1: ใช้ LIFF closeWindow (ถ้าเปิดใน LINE app)
             if (typeof liff !== 'undefined' && liff.isInClient()) {
                 try {
                     liff.closeWindow();
@@ -429,21 +717,16 @@
                 }
             }
             
-            // วิธีที่ 2: ย้อนกลับ history
             if (window.history.length > 1) {
                 window.history.back();
                 return;
             }
             
-            // วิธีที่ 3: ปิด window
             try {
                 window.close();
             } catch (e) {
                 console.error('Window close failed:', e);
             }
-            
-            // วิธีที่ 4: แสดงข้อความให้ปิดเอง
-            showSuccess('กรุณาปิดหน้าต่างนี้');
         }
         
         // ==================== LIFF INITIALIZATION ====================
