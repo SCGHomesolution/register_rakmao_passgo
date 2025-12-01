@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ลงทะเบียน รักเหมา PassGO</title>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        :root {
+            --app-font: 'Prompt', 'Noto Sans Thai', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            --primary-color: #00c851;
+            --primary-dark: #00a844;
+            --error-color: #dc3545;
+            --error-dark: #c82333;
+        }
+        
+        html, body {
+            font-family: var(--app-font) !important;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a1a, #000000);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        button, input, select, textarea {
+            font-family: var(--app-font) !important;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .view {
+            display: none;
+        }
+        
+        .view.active {
+            display: block;
+        }
+        
+        /* Spinner */
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Profile Image */
+        .profile-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 20px;
+            border: 4px solid var(--primary-color);
+            display: block;
+        }
+        
+        /* User Info */
+        .user-name {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .greeting-text {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        /* Buttons */
+        .btn {
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 18px;
+            font-weight: 500;
+            transition: all 0.3s;
+            font-family: var(--app-font) !important;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            padding: 15px 30px;
+            margin-bottom: 15px;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,200,81,0.3);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #666;
+            padding: 12px 25px;
+            border: 2px solid #ddd;
+        }
+        
+        .btn-secondary:hover:not(:disabled) {
+            border-color: #999;
+            color: #333;
+        }
+        
+        /* Messages */
+        .message {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .message.error {
+            color: var(--error-color);
+            font-weight: 500;
+        }
+        
+        .message.success {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .message-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        /* Status Box */
+        .status-box {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #333;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        /* Browser Warning */
+        .browser-warning {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+            color: #856404;
+            font-size: 13px;
+            margin-top: 15px;
+        }
+        
+        /* Confirmation Dialog */
+        .confirm-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        
+        .confirm-dialog.active {
+            display: flex;
+        }
+        
+        .confirm-content {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            max-width: 350px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .confirm-message {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        
+        .confirm-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .confirm-buttons .btn {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Loading View -->
+        <div id="loadingView" class="view active">
+            <div class="spinner"></div>
+            <div id="loadingMessage" class="message">กำลังเชื่อมต่อกับ LINE...</div>
+        </div>
+        
+        <!-- User Info View -->
+        <div id="userInfoView" class="view">
+            <img id="profileImage" class="profile-image" src="" alt="Profile Picture">
+            <div id="userName" class="user-name"></div>
+            <div class="greeting-text">
+                กรุณายืนยันเพื่อรับการแจ้งเตือน<br>ผ่าน LINE
+            </div>
+            
+            <button id="confirmBtn" class="btn btn-primary">
+                ยืนยันการเชื่อมต่อ
+            </button>
+            
+            <button id="cancelBtn" class="btn btn-secondary">
+                ยกเลิก
+            </button>
+        </div>
+        
+        <!-- Processing View -->
+        <div id="processingView" class="view">
+            <div class="spinner"></div>
+            <div id="processingMessage" class="message">กำลังเชื่อมต่อข้อมูล...</div>
+            <div id="statusBox" class="status-box" style="display:none;"></div>
+        </div>
+        
+        <!-- Success View -->
+        <div id="successView" class="view">
+            <div class="message-icon">✅</div>
+            <div class="message success">
+                เชื่อมต่อข้อมูลสำเร็จแล้ว!
+            </div>
+            <div id="successMessage" class="message">
+                กำลังปิดหน้านี้...
+            </div>
+        </div>
+        
+        <!-- Error View -->
+        <div id="errorView" class="view">
+            <div class="message-icon">❌</div>
+            <div id="errorMessage" class="message error"></div>
+            <button id="retryBtn" class="btn btn-primary" style="display:none;">
+                ลองใหม่อีกครั้ง
+            </button>
+            <button id="closeBtn" class="btn btn-secondary" style="margin-top:10px;">
+                ปิดหน้านี้
+            </button>
+        </div>
+    </div>
+    
+    <!-- Confirmation Dialog -->
+    <div id="confirmDialog" class="confirm-dialog">
+        <div class="confirm-content">
+            <div class="confirm-message">
+                คุณแน่ใจหรือไม่ว่าต้องการยกเลิก?
+            </div>
+            <div class="confirm-buttons">
+                <button id="confirmCancelBtn" class="btn btn-primary" style="background:var(--error-color);">
+                    ยกเลิก
+                </button>
+                <button id="stayBtn" class="btn btn-secondary">
+                    อยู่ต่อ
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ==================== CONFIGURATION ====================
+        const CONFIG = {
+            LIFF_ID: '2008146540-V1XjpJp4',
+            GLIDE_API_URL: 'https://api.glideapp.io/api/function/mutateTables',
+            GLIDE_API_TOKEN: 'Bearer ac38ea2f-fc70-4c94-a2c8-7a57783484e4',
+            GLIDE_APP_ID: 'BTMTjtHhXYcwc40yJMmY',
+            GLIDE_TABLE_NAME: 'native-table-eFJUxjQD1CIekyF1dXLe',
+            API_TIMEOUT: 15000,
+            INIT_TIMEOUT: 30000,
+            MIN_LOGIN_INTERVAL: 5000
+        };
+        
+        // ==================== GLOBAL STATE ====================
+        let state = {
+            userProfile: null,
+            isLoggingIn: false,
+            isProcessing: false,
+            lastLoginAttempt: 0
+        };
+        
+        // ==================== VIEW MANAGEMENT ====================
+        function showView(viewId) {
+            document.querySelectorAll('.view').forEach(view => {
+                view.classList.remove('active');
+            });
+            document.getElementById(viewId).classList.add('active');
+        }
+        
+        function showLoading(message) {
+            document.getElementById('loadingMessage').textContent = message;
+            showView('loadingView');
+        }
+        
+        function showUserInfo(profile) {
+            state.userProfile = profile;
+            
+            const defaultImage = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="%23ddd"/><text x="50" y="55" font-family="Arial" font-size="14" fill="%23999" text-anchor="middle">No Image</text></svg>';
+            
+            document.getElementById('profileImage').src = profile.pictureUrl || defaultImage;
+            document.getElementById('userName').textContent = `สวัสดีค่ะ คุณ${profile.displayName || 'ผู้ใช้'} 👋`;
+            
+            showView('userInfoView');
+        }
+        
+        function showProcessing(message) {
+            document.getElementById('processingMessage').textContent = message;
+            document.getElementById('statusBox').style.display = 'none';
+            showView('processingView');
+        }
+        
+        function updateProcessingStatus(message) {
+            const statusBox = document.getElementById('statusBox');
+            statusBox.textContent = message;
+            statusBox.style.display = 'block';
+        }
+        
+        function showSuccess(message = 'กำลังปิดหน้านี้...') {
+            document.getElementById('successMessage').textContent = message;
+            showView('successView');
+        }
+        
+        function showError(message, showRetry = false) {
+            document.getElementById('errorMessage').innerHTML = message.replace(/\n/g, '<br>');
+            document.getElementById('retryBtn').style.display = showRetry ? 'block' : 'none';
+            showView('errorView');
+        }
+        
+        // ==================== LIFF LOGIN ====================
+        async function handleLoginState() {
+            try {
+                if (state.isLoggingIn) {
+                    return false;
+                }
+                
+                if (!liff._initialized) {
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+                
+                const isLoggedIn = liff.isLoggedIn();
+                
+                if (!isLoggedIn) {
+                    const timeSinceLastAttempt = Date.now() - state.lastLoginAttempt;
+                    
+                    if (timeSinceLastAttempt < CONFIG.MIN_LOGIN_INTERVAL) {
+                        showError(
+                            'ไม่สามารถเข้าสู่ระบบได้\n\n' +
+                            'กรุณาลองเปิดลิงก์นี้ใน LINE app โดยตรง\n' +
+                            'หรือใช้ Google Chrome',
+                            false
+                        );
+                        return false;
+                    }
+                    
+                    state.isLoggingIn = true;
+                    state.lastLoginAttempt = Date.now();
+                    sessionStorage.setItem('last_login_attempt', state.lastLoginAttempt.toString());
+                    
+                    showLoading('กำลังเปิด LINE เพื่อยืนยันตัวตน...');
+                    
+                    const baseUrl = window.location.origin + window.location.pathname;
+                    liff.login({ redirectUri: baseUrl });
+                    
+                    return false;
+                }
+                
+                state.isLoggingIn = false;
+                
+                showLoading('กำลังดึงข้อมูลโปรไฟล์...');
+                const profile = await liff.getProfile();
+                
+                showUserInfo(profile);
+                return true;
+                
+            } catch (error) {
+                state.isLoggingIn = false;
+                throw error;
+            }
+        }
+        
+        // ==================== GLIDE API ====================
+        async function sendToGlideAPI() {
+            if (state.isProcessing) {
+                return;
+            }
+            
+            state.isProcessing = true;
+            
+            try {
+                if (!state.userProfile) {
+                    throw new Error('ไม่พบข้อมูลที่จำเป็น');
+                }
+                
+                showProcessing('กำลังส่งข้อมูล...');
+                
+                const payload = {
+                    appID: CONFIG.GLIDE_APP_ID,
+                    mutations: [{
+                        kind: "add-row-to-table",
+                        tableName: CONFIG.GLIDE_TABLE_NAME,
+                        columnValues: {
+                            "sAC5X": state.userProfile.userId || '',
+                            "8Ywcg": state.userProfile.displayName || '',
+                            "JV4JK": state.userProfile.pictureUrl || ''
+                        }
+                    }]
+                };
+                
+                updateProcessingStatus('กำลังเชื่อมต่อกับระบบ...');
+                
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), CONFIG.API_TIMEOUT);
+                
+                const response = await fetch(CONFIG.GLIDE_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': CONFIG.GLIDE_API_TOKEN
+                    },
+                    body: JSON.stringify(payload),
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    throw new Error(`การเชื่อมต่อล้มเหลว (${response.status})`);
+                }
+                
+                const result = await response.json();
+                
+                showSuccess();
+                
+                setTimeout(() => {
+                    closeWindow();
+                }, 1000);
+                
+            } catch (error) {
+                state.isProcessing = false;
+                
+                let errorMessage = 'เกิดข้อผิดพลาดในการเชื่อมต่อ\n\n';
+                
+                if (error.name === 'AbortError') {
+                    errorMessage += 'การเชื่อมต่อใช้เวลานานเกินไป\nกรุณาตรวจสอบสัญญาณอินเทอร์เน็ต';
+                } else if (error.message) {
+                    errorMessage += error.message;
+                } else {
+                    errorMessage += 'กรุณาลองใหม่อีกครั้ง';
+                }
+                
+                showError(errorMessage, true);
+                
+            } finally {
+                cleanupSession();
+            }
+        }
+        
+        // ==================== WINDOW CLOSING ====================
+        function closeWindow() {
+            if (window.history.length > 1) {
+                window.history.back();
+                
+                setTimeout(() => {
+                    if (!document.hidden) {
+                        tryLiffClose();
+                    }
+                }, 1000);
+                return;
+            }
+            
+            tryLiffClose();
+        }
+        
+        function tryLiffClose() {
+            try {
+                if (typeof liff !== 'undefined' && liff.isInClient()) {
+                    liff.closeWindow();
+                    
+                    setTimeout(() => {
+                        if (!document.hidden) {
+                            showManualClose();
+                        }
+                    }, 1000);
+                    return;
+                }
+            } catch (e) {
+                console.error('LIFF close failed:', e);
+            }
+            
+            showManualClose();
+        }
+        
+        function showManualClose() {
+            showSuccess('กรุณาปิดหน้าต่างนี้\nเพื่อกลับสู่ระบบ');
+        }
+        
+        // ==================== SESSION CLEANUP ====================
+        function cleanupSession() {
+            try {
+                sessionStorage.removeItem('pwa_login_redirect');
+                sessionStorage.removeItem('last_login_attempt');
+            } catch (e) {
+                // Ignore
+            }
+        }
+        
+        // ==================== CONFIRMATION DIALOG ====================
+        function showConfirmDialog() {
+            document.getElementById('confirmDialog').classList.add('active');
+        }
+        
+        function hideConfirmDialog() {
+            document.getElementById('confirmDialog').classList.remove('active');
+        }
+        
+        // ==================== LIFF INITIALIZATION ====================
+        async function initializeLiff() {
+            try {
+                showLoading('กำลังเตรียมระบบ...');
+                
+                if (typeof liff === 'undefined') {
+                    throw new Error('ไม่สามารถโหลดระบบได้\n\nกรุณาลองใหม่อีกครั้ง');
+                }
+                
+                const initPromise = liff.init({ liffId: CONFIG.LIFF_ID });
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('TIMEOUT')), CONFIG.INIT_TIMEOUT)
+                );
+                
+                await Promise.race([initPromise, timeoutPromise]);
+                
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                await handleLoginState();
+                
+            } catch (error) {
+                let errorMessage = 'ไม่สามารถเชื่อมต่อได้\n\n';
+                
+                if (error.message === 'TIMEOUT') {
+                    errorMessage += 'การเชื่อมต่อใช้เวลานานเกินไป\nกรุณาลองใหม่อีกครั้ง';
+                } else {
+                    errorMessage += error.message || 'เกิดข้อผิดพลาด';
+                }
+                
+                showError(errorMessage, true);
+            }
+        }
+        
+        // ==================== EVENT LISTENERS ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('confirmBtn').addEventListener('click', function() {
+                this.disabled = true;
+                sendToGlideAPI();
+            });
+            
+            document.getElementById('cancelBtn').addEventListener('click', function() {
+                showConfirmDialog();
+            });
+            
+            document.getElementById('confirmCancelBtn').addEventListener('click', function() {
+                hideConfirmDialog();
+                closeWindow();
+            });
+            
+            document.getElementById('stayBtn').addEventListener('click', function() {
+                hideConfirmDialog();
+            });
+            
+            document.getElementById('retryBtn').addEventListener('click', function() {
+                if (state.userProfile) {
+                    sendToGlideAPI();
+                } else {
+                    window.location.reload();
+                }
+            });
+            
+            document.getElementById('closeBtn').addEventListener('click', function() {
+                closeWindow();
+            });
+            
+            initializeLiff();
+        });
+        
+        window.addEventListener('beforeunload', cleanupSession);
+        window.addEventListener('pagehide', cleanupSession);
+        
+        window.addEventListener('error', function(e) {
+            console.error('Global Error:', e.error);
+        });
+    </script>
+</body>
+</html>
