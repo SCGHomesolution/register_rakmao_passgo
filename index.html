@@ -88,44 +88,97 @@
     </div>
   </div>
 
-    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-<script>
-  const LIFF_ID = "2008146540-1oDA848q";
-  const BACKEND_ENDPOINT = "https://script.google.com/macros/s/AKfycbxchXIzupG2Cyf-bPSVv9xYFeeH_crJWIzP_1gkKT58wcDj4WXSUxnf0Ov_jC6VITVU/exec"; // ใส่ URL จาก Apps Script
-  const RICHMENU_ID = "richmenu-43ebc76d3a259b14a64117fd57e04b4d";
+  <script>
+    const LIFF_ID = "2008146540-1oDA848q";
+    const BACKEND_ENDPOINT = "https://script.google.com/macros/s/AKfycbxchXIzupG2Cyf-bPSVv9xYFeeH_crJWIzP_1gkKT58wcDj4WXSUxnf0Ov_jC6VITVU/exec";
+    const RICHMENU_ID = "richmenu-43ebc76d3a259b14a64117fd57e04b4d";
 
-  async function callBackendToSetRichmenu(userId) {
-    const res = await fetch(BACKEND_ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        userId: userId,
-        richmenuId: RICHMENU_ID
-      })
-    });
+    const statusEl = document.getElementById("status");
+    const userIdEl = document.getElementById("userId");
+    const detailEl = document.getElementById("detail");
+    const spinnerEl = document.getElementById("spinner");
 
-    const data = await res.json();
-    if (!res.ok || !data.ok) {
-      throw new Error(JSON.stringify(data));
+    function setStatus(text, type) {
+      statusEl.textContent = text;
+      statusEl.classList.remove("status-ok", "status-error");
+      if (type === "ok") statusEl.classList.add("status-ok");
+      if (type === "error") statusEl.classList.add("status-error");
     }
-    // สำเร็จแล้ว อยากปิด LIFF ก็:
-    if (liff.isInClient()) {
-      setTimeout(() => liff.closeWindow(), 1500);
-    }
-  }
 
-  async function main() {
-    await liff.init({ liffId: LIFF_ID });
-    if (!liff.isInClient() && !liff.isLoggedIn()) {
-      liff.login();
-      return;
+    function setDetail(text) {
+      detailEl.textContent = text || "";
     }
-    const profile = await liff.getProfile();
-    const userId = profile.userId;
-    await callBackendToSetRichmenu(userId);
-  }
 
-  document.addEventListener("DOMContentLoaded", main);
-</script>
+    async function callBackendToSetRichmenu(userId) {
+      setStatus("กำลังเรียกเซิร์ฟเวอร์ตั้งค่าริชเมนู…", null);
+      setDetail("");
+
+      try {
+        const res = await fetch(BACKEND_ENDPOINT, {
+          method: "POST",
+          // ใช้ text/plain เพื่อหลบ preflight CORS
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify({
+            userId: userId,
+            richmenuId: RICHMENU_ID
+          })
+        });
+
+        const text = await res.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          data = { raw: text };
+        }
+
+        if (!res.ok || (data && data.ok === false)) {
+          throw new Error("HTTP " + res.status + " : " + text);
+        }
+
+        setStatus("ตั้งค่าริชเมนูสำเร็จแล้ว 🎉", "ok");
+        setDetail(text || "Rich menu ถูกผูกกับ user นี้แล้ว");
+
+        if (liff.isInClient()) {
+          setTimeout(() => liff.closeWindow(), 1500);
+        }
+      } catch (err) {
+        console.error(err);
+        setStatus("ตั้งค่าริชเมนูล้มเหลว", "error");
+        setDetail(err.message || String(err));
+      } finally {
+        spinnerEl.style.display = "none";
+      }
+    }
+
+    async function main() {
+      try {
+        setStatus("กำลังเริ่มต้น LIFF…", null);
+        await liff.init({ liffId: LIFF_ID });
+
+        if (!liff.isInClient() && !liff.isLoggedIn()) {
+          setStatus("กำลังพาไปล็อกอิน LINE…", null);
+          liff.login();
+          return;
+        }
+
+        setStatus("กำลังดึงข้อมูลผู้ใช้จาก LINE…", null);
+        const profile = await liff.getProfile();
+        const userId = profile.userId;
+        userIdEl.textContent = "userId: " + userId;
+
+        await callBackendToSetRichmenu(userId);
+      } catch (err) {
+        console.error(err);
+        spinnerEl.style.display = "none";
+        setStatus("เกิดข้อผิดพลาดระหว่างเชื่อมต่อ LIFF / LINE", "error");
+        setDetail(err.message || String(err));
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", main);
+  </script>
+</body>
+</html>
