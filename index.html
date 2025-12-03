@@ -88,85 +88,77 @@
     </div>
   </div>
 
-  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-<script>
-  const LIFF_ID = "2008146540-1oDA848q";
-  const BACKEND_ENDPOINT = "https://script.google.com/macros/s/AKfycbw_zdI06vaVyMtD0mVbkYgAA8aV6eL-rs8Wd5JY2LRIx2feNrctFg41QJzumHE1AEEi/exec";
-  const RICHMENU_ID = "richmenu-43ebc76d3a259b14a64117fd57e04b4d";
+  <script>
+    const LIFF_ID = "2008146540-1oDA848q"; // LIFF ID ของคุณ
+    const BACKEND_ENDPOINT = "https://script.google.com/macros/s/AKfycbwMVqf1Le4qtoie_JQUqEH6eniGrZhmw8P9roOSQO9t1RimTzoOErpapzFlQcPGFgh3/exec";
+    const RICHMENU_ID = "richmenu-43ebc76d3a259b14a64117fd57e04b4d";
 
-  const statusEl = document.getElementById("status");
-  const userIdEl = document.getElementById("userId");
-  const detailEl = document.getElementById("detail");
-  const spinnerEl = document.getElementById("spinner");
+    const statusEl = document.getElementById("status");
+    const userIdEl = document.getElementById("userId");
+    const detailEl = document.getElementById("detail");
+    const spinnerEl = document.getElementById("spinner");
 
-  function setStatus(text, type) {
-    statusEl.textContent = text;
-    statusEl.classList.remove("status-ok", "status-error");
-    if (type === "ok") statusEl.classList.add("status-ok");
-    if (type === "error") statusEl.classList.add("status-error");
-  }
-  function setDetail(text) {
-    detailEl.textContent = text || "";
-  }
+    function setStatus(text, type) {
+      statusEl.textContent = text;
+      statusEl.classList.remove("status-ok", "status-error");
+      if (type === "ok") statusEl.classList.add("status-ok");
+      if (type === "error") statusEl.classList.add("status-error");
+    }
 
-  async function callBackendToSetRichmenu(userId) {
-    setStatus("กำลังเรียกเซิร์ฟเวอร์ตั้งค่าริชเมนู…", null);
-    setDetail("");
+    function setDetail(text) {
+      detailEl.textContent = text || "";
+    }
 
-    try {
-      // ใช้ mode: 'no-cors' เพื่อไม่ให้ browser block ด้วย CORS
+    async function sendToBackend(profile) {
+      // ส่ง userId + name + image + richmenuId ไปให้ Apps Script
       await fetch(BACKEND_ENDPOINT, {
         method: "POST",
         mode: "no-cors",
         body: JSON.stringify({
-          userId: userId,
+          userId: profile.userId,
+          name: profile.displayName,
+          image: profile.pictureUrl,
           richmenuId: RICHMENU_ID
         })
       });
-
-      // เราอ่าน response ไม่ได้ (opaque) แต่ถ้าถึงบรรทัดนี้แปลว่า fetch ไม่พัง
-      setStatus("ส่งคำขอตั้งค่าริชเมนูแล้ว", "ok");
-      setDetail("ระบบส่งคำขอไปยังเซิร์ฟเวอร์เรียบร้อยแล้ว");
-      spinnerEl.style.display = "none";
-
-      if (liff.isInClient()) {
-        setTimeout(() => liff.closeWindow(), 1500);
-      }
-    } catch (err) {
-      console.error(err);
-      setStatus("ตั้งค่าริชเมนูล้มเหลว", "error");
-      setDetail(err.message || String(err));
-      spinnerEl.style.display = "none";
     }
-  }
 
-  async function main() {
-    try {
-      setStatus("กำลังเริ่มต้น LIFF…", null);
-      await liff.init({ liffId: LIFF_ID });
+    async function main() {
+      try {
+        setStatus("กำลังเริ่มต้น LIFF…", null);
+        await liff.init({ liffId: LIFF_ID });
 
-      if (!liff.isInClient() && !liff.isLoggedIn()) {
-        setStatus("กำลังพาไปล็อกอิน LINE…", null);
-        liff.login();
-        return;
+        if (!liff.isInClient() && !liff.isLoggedIn()) {
+          setStatus("กำลังพาไปล็อกอิน LINE…", null);
+          liff.login();
+          return;
+        }
+
+        setStatus("กำลังดึงข้อมูลผู้ใช้จาก LINE…", null);
+        const profile = await liff.getProfile();
+
+        userIdEl.textContent = "userId: " + profile.userId;
+        setDetail("ชื่อ: " + (profile.displayName || "-"));
+
+        setStatus("กำลังส่งคำขอตั้งค่าริชเมนู…", null);
+
+        await sendToBackend(profile);
+
+        setStatus("ส่งคำขอสำเร็จแล้ว กำลังตั้งค่าริชเมนู…", "ok");
+        spinnerEl.style.display = "none";
+
+        if (liff.isInClient()) {
+          setTimeout(() => liff.closeWindow(), 1500);
+        }
+      } catch (err) {
+        console.error(err);
+        spinnerEl.style.display = "none";
+        setStatus("เกิดข้อผิดพลาดระหว่างเชื่อมต่อ LIFF / LINE", "error");
+        setDetail(err.message || String(err));
       }
-
-      setStatus("กำลังดึงข้อมูลผู้ใช้จาก LINE…", null);
-      const profile = await liff.getProfile();
-      const userId = profile.userId;
-      userIdEl.textContent = "userId: " + userId;
-
-      await callBackendToSetRichmenu(userId);
-    } catch (err) {
-      console.error(err);
-      spinnerEl.style.display = "none";
-      setStatus("เกิดข้อผิดพลาดระหว่างเชื่อมต่อ LIFF / LINE", "error");
-      setDetail(err.message || String(err));
     }
-  }
 
-  document.addEventListener("DOMContentLoaded", main);
-</script>
-
+    document.addEventListener("DOMContentLoaded", main);
+  </script>
 </body>
 </html>
