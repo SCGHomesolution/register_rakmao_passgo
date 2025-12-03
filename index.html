@@ -1,753 +1,131 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ลงทะเบียน รักเหมา PassGO</title>
-    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        :root {
-            --app-font: 'Prompt', 'Noto Sans Thai', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            --primary-color: #00c851;
-            --primary-dark: #00a844;
-            --error-color: #dc3545;
-            --error-dark: #c82333;
-        }
-        
-        html, body {
-            font-family: var(--app-font) !important;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #1a1a1a, #000000);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        button, input, select, textarea {
-            font-family: var(--app-font) !important;
-        }
-        
-        .container {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
-        }
-        
-        .view {
-            display: none;
-        }
-        
-        .view.active {
-            display: block;
-        }
-        
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary-color);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .profile-image {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin: 0 auto 20px;
-            border: 4px solid var(--primary-color);
-            display: block;
-        }
-        
-        .user-name {
-            font-size: 24px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .wave-icon {
-            width: 28px;
-            height: 28px;
-            animation: wave 1.5s ease-in-out infinite;
-            transform-origin: 70% 70%;
-        }
-        
-        @keyframes wave {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(20deg); }
-            50% { transform: rotate(-10deg); }
-            75% { transform: rotate(20deg); }
-        }
-        
-        .greeting-text {
-            font-size: 16px;
-            color: #666;
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-        
-        .btn {
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            width: 100%;
-            font-size: 18px;
-            font-weight: 500;
-            transition: all 0.3s;
-            font-family: var(--app-font) !important;
-        }
-        
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        
-        .btn-primary {
-            background: var(--primary-color);
-            color: white;
-            padding: 15px 30px;
-            margin-bottom: 15px;
-        }
-        
-        .btn-primary:hover:not(:disabled) {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,200,81,0.3);
-        }
-        
-        .btn-secondary {
-            background: transparent;
-            color: #666;
-            padding: 12px 25px;
-            border: 2px solid #ddd;
-        }
-        
-        .btn-secondary:hover:not(:disabled) {
-            border-color: #999;
-            color: #333;
-        }
-        
-        .message {
-            color: #666;
-            font-size: 16px;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-        
-        .message.error {
-            color: var(--error-color);
-            font-weight: 500;
-        }
-        
-        .status-box {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 20px 0;
-            font-size: 14px;
-            color: #333;
-            border-left: 4px solid var(--primary-color);
-        }
-        
-        /* ==================== ERROR VIEW STYLES ==================== */
-        .error-icon-container {
-            margin-bottom: 20px;
-        }
-        
-        .error-icon {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto;
-            background: linear-gradient(135deg, #dc3545, #ff6b6b);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 30px rgba(220, 53, 69, 0.3);
-            animation: errorShake 0.5s ease-in-out;
-        }
-        
-        .error-icon svg {
-            width: 40px;
-            height: 40px;
-        }
-        
-        @keyframes errorShake {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-10px); }
-            40% { transform: translateX(10px); }
-            60% { transform: translateX(-10px); }
-            80% { transform: translateX(10px); }
-        }
-        
-        /* ==================== SUCCESS VIEW STYLES ==================== */
-        .success-container {
-            padding: 20px 0;
-        }
-        
-        .checkmark-circle {
-            width: 100px;
-            height: 100px;
-            position: relative;
-            margin: 0 auto 25px;
-        }
-        
-        .checkmark-svg {
-            width: 100px;
-            height: 100px;
-            color: #00c851;
-            animation: scaleIn 0.5s ease-out forwards;
-            filter: drop-shadow(0 10px 30px rgba(0, 200, 81, 0.4));
-        }
-        
-        .checkmark-svg path {
-            stroke-dasharray: 100;
-            stroke-dashoffset: 100;
-            animation: drawCheck 0.6s ease-out 0.4s forwards;
-        }
-        
-        @keyframes drawCheck {
-            to {
-                stroke-dashoffset: 0;
-            }
-        }
-        
-        .confetti-container {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 150px;
-            height: 150px;
-            pointer-events: none;
-        }
-        
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            opacity: 0;
-        }
-        
-        .confetti:nth-child(1) {
-            background: #00c851;
-            left: 20%;
-            animation: confetti1 1s ease-out 0.7s forwards;
-        }
-        
-        .confetti:nth-child(2) {
-            background: #ffeb3b;
-            left: 40%;
-            border-radius: 50%;
-            animation: confetti2 1s ease-out 0.8s forwards;
-        }
-        
-        .confetti:nth-child(3) {
-            background: #2196f3;
-            left: 60%;
-            animation: confetti3 1s ease-out 0.75s forwards;
-        }
-        
-        .confetti:nth-child(4) {
-            background: #ff5722;
-            left: 80%;
-            border-radius: 50%;
-            animation: confetti4 1s ease-out 0.85s forwards;
-        }
-        
-        .confetti:nth-child(5) {
-            background: #9c27b0;
-            left: 30%;
-            animation: confetti5 1s ease-out 0.9s forwards;
-        }
-        
-        .confetti:nth-child(6) {
-            background: #00bcd4;
-            left: 70%;
-            border-radius: 50%;
-            animation: confetti6 1s ease-out 0.95s forwards;
-        }
-        
-        .success-title {
-            font-size: 26px;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 10px;
-            opacity: 0;
-            animation: fadeInUp 0.5s ease-out 0.8s forwards;
-        }
-        
-        .success-subtitle {
-            font-size: 16px;
-            color: #666;
-            margin-bottom: 20px;
-            opacity: 0;
-            animation: fadeInUp 0.5s ease-out 0.9s forwards;
-        }
-        
-        .pulse-ring {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 3px solid rgba(0, 200, 81, 0.5);
-            animation: pulseRing 1.5s ease-out 0.5s infinite;
-        }
-        
-        .pulse-ring:nth-child(2) {
-            animation-delay: 0.8s;
-        }
-        
-        @keyframes scaleIn {
-            0% { transform: scale(0); opacity: 0; }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        
-        @keyframes pulseRing {
-            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
-            100% { transform: translate(-50%, -50%) scale(1.8); opacity: 0; }
-        }
-        
-        @keyframes fadeInUp {
-            0% { opacity: 0; transform: translateY(20px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes confetti1 {
-            0% { opacity: 1; transform: translateY(0) rotate(0deg); }
-            100% { opacity: 0; transform: translateY(-100px) translateX(-20px) rotate(360deg); }
-        }
-        
-        @keyframes confetti2 {
-            0% { opacity: 1; transform: translateY(0) rotate(0deg); }
-            100% { opacity: 0; transform: translateY(-120px) translateX(10px) rotate(-360deg); }
-        }
-        
-        @keyframes confetti3 {
-            0% { opacity: 1; transform: translateY(0) rotate(0deg); }
-            100% { opacity: 0; transform: translateY(-90px) translateX(15px) rotate(270deg); }
-        }
-        
-        @keyframes confetti4 {
-            0% { opacity: 1; transform: translateY(0) rotate(0deg); }
-            100% { opacity: 0; transform: translateY(-110px) translateX(25px) rotate(-270deg); }
-        }
-        
-        @keyframes confetti5 {
-            0% { opacity: 1; transform: translateY(0) rotate(0deg); }
-            100% { opacity: 0; transform: translateY(-130px) translateX(-15px) rotate(450deg); }
-        }
-        
-        @keyframes confetti6 {
-            0% { opacity: 1; transform: translateY(0) rotate(0deg); }
-            100% { opacity: 0; transform: translateY(-80px) translateX(20px) rotate(-450deg); }
-        }
-        
-        .loading-dots {
-            display: inline-block;
-        }
-        
-        .loading-dots span {
-            animation: dotPulse 1.4s infinite ease-in-out both;
-        }
-        
-        .loading-dots span:nth-child(1) { animation-delay: 0s; }
-        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
-        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
-        
-        @keyframes dotPulse {
-            0%, 80%, 100% { opacity: 0.3; }
-            40% { opacity: 1; }
-        }
-    </style>
+  <meta charset="utf-8" />
+  <title>ตั้งค่าริชเมนูอัตโนมัติ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- LIFF SDK -->
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      background: #f3f4f6;
+    }
+    .app {
+      min-height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 20px 18px 18px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      text-align: center;
+    }
+    h1 {
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+      color: #111827;
+    }
+    p {
+      font-size: 0.9rem;
+      color: #4b5563;
+      margin-bottom: 6px;
+      word-break: break-all;
+    }
+    .muted {
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+    .small {
+      font-size: 0.75rem;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: 4px solid #e5e7eb;
+      border-top-color: #22c55e;
+      margin: 16px auto;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    .status-ok {
+      color: #16a34a;
+      font-weight: 600;
+    }
+    .status-error {
+      color: #dc2626;
+      font-weight: 500;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Loading View -->
-        <div id="loadingView" class="view active">
-            <div class="spinner"></div>
-            <div id="loadingMessage" class="message">กำลังเชื่อมต่อกับ LINE...</div>
-        </div>
-        
-        <!-- User Info View -->
-        <div id="userInfoView" class="view">
-            <img id="profileImage" class="profile-image" src="" alt="Profile Picture">
-            <div id="userName" class="user-name"></div>
-            <div class="greeting-text">
-                กรุณากดยืนยันการลงทะเบียน<br>ผ่าน LINE
-            </div>
-            
-            <button id="confirmBtn" class="btn btn-primary">
-                ยืนยันการลงทะเบียน
-            </button>
-        </div>
-        
-        <!-- Processing View -->
-        <div id="processingView" class="view">
-            <div class="spinner"></div>
-            <div id="processingMessage" class="message">กำลังเชื่อมต่อข้อมูล...</div>
-            <div id="statusBox" class="status-box" style="display:none;"></div>
-        </div>
-        
-        <!-- Success View -->
-        <div id="successView" class="view">
-            <div class="success-container">
-                <div class="checkmark-circle">
-                    <div class="pulse-ring"></div>
-                    <div class="pulse-ring"></div>
-                    <svg class="checkmark-svg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                    </svg>
-                    <div class="confetti-container">
-                        <div class="confetti"></div>
-                        <div class="confetti"></div>
-                        <div class="confetti"></div>
-                        <div class="confetti"></div>
-                        <div class="confetti"></div>
-                        <div class="confetti"></div>
-                    </div>
-                </div>
-                
-                <div class="success-title">ลงทะเบียนสำเร็จ!</div>
-                <div class="success-subtitle">
-                    กำลังปิดหน้านี้<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Error View -->
-        <div id="errorView" class="view">
-            <div class="error-icon-container">
-                <div class="error-icon">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M18 6L6 18M6 6L18 18" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-            </div>
-            <div id="errorMessage" class="message error"></div>
-            <button id="retryBtn" class="btn btn-primary" style="display:none;">
-                ลองใหม่อีกครั้ง
-            </button>
-            <button id="closeBtn" class="btn btn-secondary" style="margin-top:10px;">
-                ปิดหน้านี้
-            </button>
-        </div>
+  <div class="app">
+    <div class="card">
+      <h1>กำลังตั้งค่าริชเมนูให้คุณ…</h1>
+      <div id="spinner" class="spinner"></div>
+      <p id="status">กำลังเริ่มต้น LIFF…</p>
+      <p id="userId" class="muted"></p>
+      <p id="detail" class="muted small"></p>
     </div>
-    
-    <script>
-        // ==================== CONFIGURATION ====================
-        const CONFIG = {
-            LIFF_ID: '2008593904-3nV6lgrg',
-            GLIDE_API_URL: 'https://api.glideapp.io/api/function/mutateTables',
-            GLIDE_API_TOKEN: 'Bearer ac38ea2f-fc70-4c94-a2c8-7a57783484e4',
-            GLIDE_APP_ID: 'BTMTjtHhXYcwc40yJMmY',
-            GLIDE_TABLE_NAME: 'native-table-eFJUxjQD1CIekyF1dXLe',
-            API_TIMEOUT: 15000,
-            INIT_TIMEOUT: 30000,
-            MIN_LOGIN_INTERVAL: 5000
-        };
-        
-        // Wave hand SVG icon
-        const WAVE_ICON_SVG = `<svg class="wave-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M7.5 12.5L5.5 10.5C4.94772 9.94772 4.94772 9.05228 5.5 8.5C6.05228 7.94772 6.94772 7.94772 7.5 8.5L12 13" stroke="#FFB800" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M9.5 10.5L7.5 8.5C6.94772 7.94772 6.94772 7.05228 7.5 6.5C8.05228 5.94772 8.94772 5.94772 9.5 6.5L14 11" stroke="#FFB800" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M11.5 8.5L10.5 7.5C9.94772 6.94772 9.94772 6.05228 10.5 5.5C11.0523 4.94772 11.9477 4.94772 12.5 5.5L17 10" stroke="#FFB800" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M13.5 6.5L13 6C12.4477 5.44772 12.4477 4.55228 13 4C13.5523 3.44772 14.4477 3.44772 15 4L19 8C21 10 21 13 19 15L17 17C15 19 12 19 10 17L6.5 13.5C5.94772 12.9477 5.94772 12.0523 6.5 11.5C7.05228 10.9477 7.94772 10.9477 8.5 11.5L11.5 14.5" stroke="#FFB800" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>`;
-        
-        // ==================== GLOBAL STATE ====================
-        let state = {
-            userProfile: null,
-            isLoggingIn: false,
-            isProcessing: false,
-            lastLoginAttempt: 0
-        };
-        
-        // ==================== VIEW MANAGEMENT ====================
-        function showView(viewId) {
-            document.querySelectorAll('.view').forEach(view => {
-                view.classList.remove('active');
-            });
-            document.getElementById(viewId).classList.add('active');
-        }
-        
-        function showLoading(message) {
-            document.getElementById('loadingMessage').textContent = message;
-            showView('loadingView');
-        }
-        
-        function showUserInfo(profile) {
-            state.userProfile = profile;
-            
-            const defaultImage = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="%23ddd"/><text x="50" y="55" font-family="Arial" font-size="14" fill="%23999" text-anchor="middle">No Image</text></svg>';
-            
-            document.getElementById('profileImage').src = profile.pictureUrl || defaultImage;
-            document.getElementById('userName').innerHTML = `<span>สวัสดีค่ะ คุณ${profile.displayName || 'ผู้ใช้'}</span>${WAVE_ICON_SVG}`;
-            
-            showView('userInfoView');
-        }
-        
-        function showProcessing(message) {
-            document.getElementById('processingMessage').textContent = message;
-            document.getElementById('statusBox').style.display = 'none';
-            showView('processingView');
-        }
-        
-        function updateProcessingStatus(message) {
-            const statusBox = document.getElementById('statusBox');
-            statusBox.textContent = message;
-            statusBox.style.display = 'block';
-        }
-        
-        function showSuccess() {
-            showView('successView');
-        }
-        
-        function showError(message, showRetry = false) {
-            document.getElementById('errorMessage').innerHTML = message.replace(/\n/g, '<br>');
-            document.getElementById('retryBtn').style.display = showRetry ? 'block' : 'none';
-            showView('errorView');
-        }
-        
-        // ==================== LIFF LOGIN ====================
-        async function handleLoginState() {
-            try {
-                if (state.isLoggingIn) {
-                    return false;
-                }
-                
-                if (!liff._initialized) {
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                }
-                
-                const isLoggedIn = liff.isLoggedIn();
-                
-                if (!isLoggedIn) {
-                    const timeSinceLastAttempt = Date.now() - state.lastLoginAttempt;
-                    
-                    if (timeSinceLastAttempt < CONFIG.MIN_LOGIN_INTERVAL) {
-                        showError(
-                            'ไม่สามารถเข้าสู่ระบบได้\n\n' +
-                            'กรุณาลองเปิดลิงก์นี้ใน LINE app โดยตรง\n' +
-                            'หรือใช้ Google Chrome',
-                            false
-                        );
-                        return false;
-                    }
-                    
-                    state.isLoggingIn = true;
-                    state.lastLoginAttempt = Date.now();
-                    sessionStorage.setItem('last_login_attempt', state.lastLoginAttempt.toString());
-                    
-                    showLoading('กำลังเปิด LINE เพื่อยืนยันตัวตน...');
-                    
-                    const baseUrl = window.location.origin + window.location.pathname;
-                    liff.login({ redirectUri: baseUrl });
-                    
-                    return false;
-                }
-                
-                state.isLoggingIn = false;
-                
-                showLoading('กำลังดึงข้อมูลโปรไฟล์...');
-                const profile = await liff.getProfile();
-                
-                showUserInfo(profile);
-                return true;
-                
-            } catch (error) {
-                state.isLoggingIn = false;
-                throw error;
-            }
-        }
-        
-        // ==================== GLIDE API ====================
-        async function sendToGlideAPI() {
-            if (state.isProcessing) {
-                return;
-            }
-            
-            state.isProcessing = true;
-            
-            try {
-                if (!state.userProfile) {
-                    throw new Error('ไม่พบข้อมูลที่จำเป็น');
-                }
-                
-                showProcessing('กำลังส่งข้อมูล...');
-                
-                const payload = {
-                    appID: CONFIG.GLIDE_APP_ID,
-                    mutations: [{
-                        kind: "add-row-to-table",
-                        tableName: CONFIG.GLIDE_TABLE_NAME,
-                        columnValues: {
-                            "sAC5X": state.userProfile.userId || '',
-                            "8Ywcg": state.userProfile.displayName || '',
-                            "JV4JK": state.userProfile.pictureUrl || ''
-                        }
-                    }]
-                };
-                
-                updateProcessingStatus('กำลังเชื่อมต่อกับระบบ...');
-                
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), CONFIG.API_TIMEOUT);
-                
-                const response = await fetch(CONFIG.GLIDE_API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': CONFIG.GLIDE_API_TOKEN
-                    },
-                    body: JSON.stringify(payload),
-                    signal: controller.signal
-                });
-                
-                clearTimeout(timeoutId);
-                
-                if (!response.ok) {
-                    throw new Error(`การเชื่อมต่อล้มเหลว (${response.status})`);
-                }
-                
-                const result = await response.json();
-                
-                showSuccess();
-                
-                setTimeout(() => {
-                    closeWindow();
-                }, 2500);
-                
-            } catch (error) {
-                state.isProcessing = false;
-                
-                let errorMessage = 'เกิดข้อผิดพลาดในการเชื่อมต่อ\n\n';
-                
-                if (error.name === 'AbortError') {
-                    errorMessage += 'การเชื่อมต่อใช้เวลานานเกินไป\nกรุณาตรวจสอบสัญญาณอินเทอร์เน็ต';
-                } else if (error.message) {
-                    errorMessage += error.message;
-                } else {
-                    errorMessage += 'กรุณาลองใหม่อีกครั้ง';
-                }
-                
-                showError(errorMessage, true);
-            }
-        }
-        
-        // ==================== WINDOW CLOSING ====================
-        function closeWindow() {
-            if (typeof liff !== 'undefined' && liff.isInClient()) {
-                try {
-                    liff.closeWindow();
-                    return;
-                } catch (e) {
-                    console.error('LIFF close failed:', e);
-                }
-            }
-            
-            if (window.history.length > 1) {
-                window.history.back();
-                return;
-            }
-            
-            try {
-                window.close();
-            } catch (e) {
-                console.error('Window close failed:', e);
-            }
-        }
-        
-        // ==================== LIFF INITIALIZATION ====================
-        async function initializeLiff() {
-            try {
-                showLoading('กำลังเตรียมระบบ...');
-                
-                if (typeof liff === 'undefined') {
-                    throw new Error('ไม่สามารถโหลดระบบได้\n\nกรุณาลองใหม่อีกครั้ง');
-                }
-                
-                const initPromise = liff.init({ liffId: CONFIG.LIFF_ID });
-                const timeoutPromise = new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error('TIMEOUT')), CONFIG.INIT_TIMEOUT)
-                );
-                
-                await Promise.race([initPromise, timeoutPromise]);
-                
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                await handleLoginState();
-                
-            } catch (error) {
-                let errorMessage = 'ไม่สามารถเชื่อมต่อได้\n\n';
-                
-                if (error.message === 'TIMEOUT') {
-                    errorMessage += 'การเชื่อมต่อใช้เวลานานเกินไป\nกรุณาลองใหม่อีกครั้ง';
-                } else {
-                    errorMessage += error.message || 'เกิดข้อผิดพลาด';
-                }
-                
-                showError(errorMessage, true);
-            }
-        }
-        
-        // ==================== EVENT LISTENERS ====================
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('confirmBtn').addEventListener('click', function() {
-                this.disabled = true;
-                sendToGlideAPI();
-            });
-            
-            document.getElementById('retryBtn').addEventListener('click', function() {
-                if (state.userProfile) {
-                    sendToGlideAPI();
-                } else {
-                    window.location.reload();
-                }
-            });
-            
-            document.getElementById('closeBtn').addEventListener('click', function() {
-                closeWindow();
-            });
-            
-            initializeLiff();
-        });
-        
-        window.addEventListener('error', function(e) {
-            console.error('Global Error:', e.error);
-        });
-    </script>
-</body>
-</html>
+  </div>
+
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<script>
+  const LIFF_ID = "YOUR_LIFF_ID_HERE";
+  const BACKEND_ENDPOINT = "https://script.google.com/macros/s/AKfycbxchXIzupG2Cyf-bPSVv9xYFeeH_crJWIzP_1gkKT58wcDj4WXSUxnf0Ov_jC6VITVU/exec"; // ใส่ URL จาก Apps Script
+  const RICHMENU_ID = "richmenu-43ebc76d3a259b14a64117fd57e04b4d";
+
+  async function callBackendToSetRichmenu(userId) {
+    const res = await fetch(BACKEND_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        userId: userId,
+        richmenuId: RICHMENU_ID
+      })
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.ok) {
+      throw new Error(JSON.stringify(data));
+    }
+    // สำเร็จแล้ว อยากปิด LIFF ก็:
+    if (liff.isInClient()) {
+      setTimeout(() => liff.closeWindow(), 1500);
+    }
+  }
+
+  async function main() {
+    await liff.init({ liffId: LIFF_ID });
+    if (!liff.isInClient() && !liff.isLoggedIn()) {
+      liff.login();
+      return;
+    }
+    const profile = await liff.getProfile();
+    const userId = profile.userId;
+    await callBackendToSetRichmenu(userId);
+  }
+
+  document.addEventListener("DOMContentLoaded", main);
+</script>
